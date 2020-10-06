@@ -11,63 +11,63 @@ See also https://forum.unity.com/threads/serializereference-content-of-deseriali
 
 We deserialize data from a json file stored on disk.
 
-The data is deserialized into an instance of an classs containing 2 fields: 
+The data is deserialized into an instance of an class containing 2 serialized fields: 
 * one `List<string>` tagged with the SerializeField attribute and
 * one `List<Object>` tagged with the SerializeReference attribute.
 
 ```
-	[Serializable]
-	public class DataPersistenceObjectModel : ISerializationCallbackReceiver
+[Serializable]
+public class DataPersistenceObjectModel : ISerializationCallbackReceiver
+{
+	private Dictionary<string, System.Object> _data = new Dictionary<string, object>();
+	[SerializeField] List<string> dataKeys = new List<string>();
+	[SerializeReference] List<System.Object> dataValues = new List<System.Object>();
+
+	public void OnBeforeSerialize()
 	{
-		private Dictionary<string, System.Object> _data = new Dictionary<string, object>();
-		[SerializeField] List<string> dataKeys = new List<string>();
-		[SerializeReference] List<System.Object> dataValues = new List<System.Object>();
-
-		public void OnBeforeSerialize()
-		{
-			dataKeys.Clear();
-			dataValues.Clear();
-			dataKeys.AddRange(Data.Keys);
-			dataValues.AddRange(Data.Values);
-		}
-
-		static ObjectIDGenerator objectIDGenerator = new ObjectIDGenerator();
-
-		public void OnAfterDeserialize()
-		{
-			if (_data == null)
-				_data = new Dictionary<string, System.Object>();
-			else
-				_data.Clear();
-
-			Dump("AfterDeserialize serialized keys and values", dataKeys, dataValues);
-
-			for (int i = 0; i != System.Math.Min(dataKeys.Count, dataValues.Count); i++)
-				_data.Add(dataKeys[i], dataValues[i]);
-			dataKeys.Clear();
-			dataValues.Clear();
-
-			Dump("AfterDeserialize dictionary", _data.Keys, _data.Values);
-		}
-
-		public void Dump(string prefix, IEnumerable<string> keys, IEnumerable<object> values)
-		{
-			var dump = new StringBuilder("Dump - ").Append(prefix).AppendLine();
-			for (var i = 0; i < keys.Count(); i++)
-			{
-				var key = keys.ElementAt(i);
-				var value = values.ElementAt(i);
-				var first = false;
-
-				dump.Append("[").Append(i).Append("] ").Append("{").Append(key).Append(':').Append(value).Append("} id:")
-					.AppendLine(objectIDGenerator.GetId(value, out first).ToString());
-			}
-
-			Debug.Log(dump.ToString());
-		}
-
-		public Dictionary<string, System.Object> Data => _data;
+		dataKeys.Clear();
+		dataValues.Clear();
+		dataKeys.AddRange(Data.Keys);
+		dataValues.AddRange(Data.Values);
 	}
+
+	static ObjectIDGenerator objectIDGenerator = new ObjectIDGenerator();
+
+	public void OnAfterDeserialize()
+	{
+		if (_data == null)
+			_data = new Dictionary<string, System.Object>();
+		else
+			_data.Clear();
+
+		Dump("AfterDeserialize serialized keys and values", dataKeys, dataValues);
+
+		for (int i = 0; i != System.Math.Min(dataKeys.Count, dataValues.Count); i++)
+			_data.Add(dataKeys[i], dataValues[i]);
+		dataKeys.Clear();
+		dataValues.Clear();
+
+		Dump("AfterDeserialize dictionary", _data.Keys, _data.Values);
+	}
+
+	public void Dump(string prefix, IEnumerable<string> keys, IEnumerable<object> values)
+	{
+		var dump = new StringBuilder("Dump - ").Append(prefix).AppendLine();
+		for (var i = 0; i < keys.Count(); i++)
+		{
+			var key = keys.ElementAt(i);
+			var value = values.ElementAt(i);
+			var first = false;
+
+			dump.Append("[").Append(i).Append("] ").Append("{").Append(key).Append(':').Append(value).Append("} id:")
+				.AppendLine(objectIDGenerator.GetId(value, out first).ToString());
+		}
+
+		Debug.Log(dump.ToString());
+	}
+
+	public Dictionary<string, System.Object> Data => _data;
+}
 ```
 
 We check the data after we receive the OnAfterDeserialize callback and the data is correct.
