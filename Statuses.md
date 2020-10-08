@@ -132,13 +132,15 @@ The code for the code weaving can be found [here](https://github.com/svermeulen/
   
 3. If we let Zenject call the baked methods, and log + check the deserialized data consistency before calling any baked method, we detect memory corruption.
 
-4. if we add a trigger to log data during the zenject code prior to calls to baked method, we get a native crash with stack pointing to `__icall_wrapper_mono_marshal_isinst_with_cache`. Full stack below
+4. if we add a trigger to log data during the zenject code prior to calls to baked method, we get a native crash with stack pointing to  [mono_aot_get_cached_class_info](https://github.com/mono/mono/blob/7bf83ecd4ab44b19ca3712d55e9b48dab2591c59/mono/mini/aot-runtime.c#L2758). Full stack below
 
 5. if we add more logging code in different places during zenject 'get inject info', we do not have memory corruption.
 
 ## Current assumption on the issue
 
-:warning:we believe there's a bug in the mono code and it is triggered by the zenject startup that uses reflection. This would explain why on different computers, or different call stacks, we get either no memory corruption or native crashes.:warning:
+To summarize, we are able to reliably alter between memory corruption, no memory corruption and native crashes in the Mono AOT depending on whether we activate/deactivate some Zenject reflection optimization code, add/remove logging, etc.
+
+:warning:we believe there's an allocation bug in mono and it is somewhat triggered by the zenject startup that uses reflection. This would explain why on different computers, or different call stacks, we get either no memory corruption or native crashes.:warning:
   
   
 # Appendixes
