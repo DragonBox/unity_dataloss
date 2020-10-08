@@ -124,8 +124,43 @@ We do not manage to reproduce it in editor yet.
 
 The project uses [Zenject Baking](https://github.com/svermeulen/Extenject#reflection-baking). This consists of code weaving that is ran at build time. Note right now it only bakes Zenject classes.
 
-The code for the code weaving can be found [here](https://github.com/svermeulen/Extenject/blob/master/UnityProject/Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Common/ReflectionBakingModuleEditor.cs#L125-L160) and [here](https://github.com/svermeulen/Extenject/blob/master/UnityProject/Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Common/ReflectionBakingModuleEditor.cs#L437).
+The code for the code weaving can be found [here](https://github.com/svermeulen/Extenject/blob/master/UnityProject/Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Common/ReflectionBakingModuleEditor.cs#L125-L160) and [here](https://github.com/svermeulen/Extenject/blob/master/UnityProject/Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Common/ReflectionBakingModuleEditor.cs#L437). It is called at runtime [during the zenject 'get inject info'](https://github.com/svermeulen/Extenject/blob/dd91e0099af8092ce7bd49086125f84e529576e9/UnityProject/Assets/Plugins/Zenject/Source/Util/TypeAnalyzer.cs#L175-L192).
 
-  :warning:When we deactivate Zenject Baking it at build time, the problem disappears:warning:
+1. When we deactivate Zenject Baking it at build time, the problem disappears
 
-  :warning:When we keep Zenject Baking at build time, but do not let Zenject call the baked methods and rely on reflection instead the problem disappears.:warning:
+2. When we keep Zenject Baking at build time, but do not let Zenject call the baked methods and rely on reflection instead the problem disappears.
+  
+3. If we let Zenject call the baked methods, and log + check the deserialized data consistency before calling any baked method, we detect memory corruption.
+
+4. if we add a trigger to log data during the zenject code prior to calls to baked method, we get a native crash with stack pointing to `__icall_wrapper_mono_marshal_isinst_with_cache`. Full stack below
+
+5. if we add more logging code in different places during zenject 'get inject info', we do not have memory corruption.
+
+## Current assumption on the issue
+
+:warning:we believe there's a bug in the mono code and it is triggered by the zenject startup that uses reflection. This would explain why on different computers, or different call stacks, we get either no memory corruption or native crashes.:warning:
+  
+  
+# Appendixes
+
+## Native crash 
+
+```
+Obtained 46 stack frames.
+#0  0x0000011a058d25 in mono_aot_get_cached_class_info
+#1  0x0000011a12876b in mono_class_init
+#2  0x0000011a133550 in mono_class_is_assignable_from
+#3  0x0000011a19ad8f in mono_object_handle_isinst
+#4  0x0000011a19ae21 in mono_object_isinst_checked
+#5  0x0000011a15daf9 in mono_marshal_isinst_with_cache
+#6  0x0000011e489115 in  (wrapper managed-to-native) object:__icall_wrapper_mono_marshal_isinst_with_cache (object,intptr,intptr) {0x7fd224409558} + 0x65 (0x11e4890b0 0x11e4891a5) [0x11a722c80 - Unity Root Domain]
+#7  0x00000126ebd87b in  WWTK.School.AppDataStorageInstaller/<>c__DisplayClass2_0:<InstallBindings>b__0 (object) {0x7fd223403400} + 0x24b (0x126ebd630 0x126ebda33) [0x11a722c80 - Unity Root Domain]
+#8  0x00000126ebd5af in  (wrapper delegate-invoke) System.Action`1<T_REF>:invoke_void_T (T_REF) {0x6080008b8ea0} + 0xcf (0x126ebd4e0 0x126ebd62b) [0x11a722c80 - Unity Root Domain]
+#9  0x00000126e90d63 in  Zenject.DiContainer:InstantiateExplicit (System.Type,bool,System.Collections.Generic.List`1<Zenject.TypeValuePair>,Zenject.InjectContext,object) {0x7fd223b7f7c8} + 0x173 (0x126e90bf0 0x126e90d7f) [0x11a722c80 - Unity Root Domain]
+#10 0x00000126e90abb in  Zenject.DiContainer:InstantiateExplicit (System.Type,System.Collections.Generic.List`1<Zenject.TypeValuePair>) {0x7fd223b7ef00} + 0x8b (0x126e90a30 0x126e90ac9) [0x11a722c80 - Unity Root Domain]
+#11 0x00000126e98ab3 in  Zenject.Context:InstallInstallers () {0x7fd224251320} + 0x33 (0x126e98a80 0x126e98abc) [0x11a722c80 - Unity Root Domain]
+#12 0x0000011e48c16b in  Zenject.ProjectContext:InstantiateAndInitialize () {0x7fd22324d4c8} + 0x23b (0x11e48bf30 0x11e48c1c6) [0x11a722c80 - Unity Root Domain]
+#13 0x00000119fd347c in mono_jit_runtime_invoke
+#14 0x0000011a195f75 in do_runtime_invoke
+#15 0x0000011a195ed3 in mono_runtime_invoke
+```
