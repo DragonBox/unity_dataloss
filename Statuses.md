@@ -1,7 +1,9 @@
 Statuses memory corruption / JsonUtility
 =
 
-We are investigating an issue related to memory corruption post desynchronization using JsonUtility.
+tldr; something corrupts the memory, perhaps in Mono AOT, and affects deserialization of objects using SerializeReference in JsonUtility
+
+We are investigating an issue related to memory corruption post deserialization using JsonUtility.
 
 See Unity 1275317 (FIXME LINK MISSING AS ISSUE WAS TEMPORARILY CLOSED BY UNITY)
 
@@ -126,7 +128,7 @@ The project uses [Zenject Baking](https://github.com/svermeulen/Extenject#reflec
 
 The code for the code weaving can be found [here](https://github.com/svermeulen/Extenject/blob/master/UnityProject/Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Common/ReflectionBakingModuleEditor.cs#L125-L160) and [here](https://github.com/svermeulen/Extenject/blob/master/UnityProject/Assets/Plugins/Zenject/OptionalExtras/ReflectionBaking/Common/ReflectionBakingModuleEditor.cs#L437). It is called at runtime [during the zenject 'get inject info'](https://github.com/svermeulen/Extenject/blob/dd91e0099af8092ce7bd49086125f84e529576e9/UnityProject/Assets/Plugins/Zenject/Source/Util/TypeAnalyzer.cs#L175-L192).
 
-1. When we deactivate Zenject Baking it at build time, the problem disappears
+1. When we deactivate Zenject Baking it at build time, the problem disappears *on that computer*. It still exist for other users
 
 2. When we keep Zenject Baking at build time, but do not let Zenject call the baked methods and rely on reflection instead the problem disappears.
   
