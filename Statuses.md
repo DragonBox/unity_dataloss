@@ -193,6 +193,14 @@ Obtained 46 stack frames.
 ### Native crash #3
 
 ```
+var originalObject ...
+var typeToReflect = originalObject.GetType();
+Debug.Log($"typeToReflect {typeToReflect} of object {originalObject}");
+```
+
+crashes in:
+
+```
 Obtained 256 stack frames.
 #0  0x00000000000000 in (Unknown)
 #1  0x00000124b80bcb in  string:FormatHelper (System.IFormatProvider,string,System.ParamsArray) {0x7f9ff688e5e0} + 0x9b (0x124b80b30 0x124b80c1b) [0x116a7ec80 - Unity Root Domain]
@@ -231,30 +239,4 @@ Obtained 256 stack frames.
 #12 0x007fa977b46a50 in (Unknown)
 #13 0x007fa977b46a50 in (Unknown)
 #14 0x007fa977b46a50 in (Unknown)
-```
-
-### Native crash #5
-
-```
-var originalObject ...
-var typeToReflect = originalObject.GetType();
-Debug.Log($"typeToReflect {typeToReflect} of object {originalObject}");
-```
-
-crashes in:
-
-```
-Obtained 256 stack frames.
-#0  0x00000000000000 in (Unknown)
-#1  0x00000124b80bcb in  string:FormatHelper (System.IFormatProvider,string,System.ParamsArray) {0x7f9ff688e5e0} + 0x9b (0x124b80b30 0x124b80c1b) [0x116a7ec80 - Unity Root Domain]
-#2  0x00000124b81f23 in  string:Format (string,object,object) {0x7f9ff688e518} + 0xa3 (0x124b81e80 0x124b81f25) [0x116a7ec80 - Unity Root Domain]
-#3  0x00000124b81b73 in  System.ObjectExtensions:InternalCopy (object,System.Collections.Generic.IDictionary`2<object, object>) {0x7f9ff6b8eba8} + 0x73 (0x124b81b00 0x124b81e33) [0x116a7ec80 - Unity Root Domain]
-#4  0x00000000000000 in (Unknown)
-#5  0x2000000000000001 in (Unknown)
-#6  0x007f9ff6b8ec50 in (Unknown)
-#7  0x007f9ff6b8ec50 in (Unknown)
-#8  0x007f9ff6b8ec50 in (Unknown)
-#9  0x007f9ff6b8ec50 in (Unknown)
-#10 0x007f9ff6b8ec50 in (Unknown)
-x#11 0x007f9ff6b8ec50 in (Unknown)
 ```
