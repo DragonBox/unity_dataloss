@@ -147,7 +147,9 @@ To summarize, we are able to reliably alter between memory corruption, no memory
   
 # Appendixes
 
-## Native crash 
+## Native crashes
+
+### Native crash #1
 
 ```
 Obtained 46 stack frames.
@@ -167,4 +169,66 @@ Obtained 46 stack frames.
 #13 0x00000119fd347c in mono_jit_runtime_invoke
 #14 0x0000011a195f75 in do_runtime_invoke
 #15 0x0000011a195ed3 in mono_runtime_invoke
+```
+
+### Native crash #2
+
+```
+#0  0x0000010866e2e0 in mono_os_event_wait_multiple
+#1  0x0000010866e1a5 in mono_os_event_wait_one
+#2  0x0000010867fb63 in mono_thread_info_wait_one_handle
+#3  0x0000010862bb51 in ves_icall_System_Threading_Thread_Join_internal
+#4  0x0000012ecacc77 in  (wrapper managed-to-native) System.Threading.Thread:JoinInternal (System.Threading.Thread,int) {0x7fd541c6d7c8} + 0x67 (0x12ecacc10 0x12ecacd23) [0x107622c80 - Unity Root Domain]
+#5  0x0000010766ceac in  (wrapper runtime-invoke) object:runtime_invoke_virtual_void__this__ (object,intptr,intptr,intptr) {0x7fd5418d5f98} + 0x7c (0x10766ce30 0x10766cf23) [0x107622c80 - Unity Root Domain]
+#6  0x0000010866755b in mono_gc_run_finalize
+#7  0x000001086691a1 in finalizer_thread
+#8  0x0000010862fbed in start_wrapper
+#9  0x000001086a3bf2 in GC_inner_start_routine
+#10 0x000001086a3b87 in GC_start_routine
+#11 0x007fff5ab37661 in _pthread_body
+#12 0x007fff5ab3750d in _pthread_body
+#13 0x007fff5ab36bf9 in thread_start
+```
+
+### Native crash #3
+
+```
+Obtained 256 stack frames.
+#0  0x00000000000000 in (Unknown)
+#1  0x00000124b80bcb in  string:FormatHelper (System.IFormatProvider,string,System.ParamsArray) {0x7f9ff688e5e0} + 0x9b (0x124b80b30 0x124b80c1b) [0x116a7ec80 - Unity Root Domain]
+#2  0x00000124b81f23 in  string:Format (string,object,object) {0x7f9ff688e518} + 0xa3 (0x124b81e80 0x124b81f25) [0x116a7ec80 - Unity Root Domain]
+#3  0x00000124b81b73 in  System.ObjectExtensions:InternalCopy (object,System.Collections.Generic.IDictionary`2<object, object>) {0x7f9ff6b8eba8} + 0x73 (0x124b81b00 0x124b81e33) [0x116a7ec80 - Unity Root Domain]
+#4  0x00000000000000 in (Unknown)
+#5  0x2000000000000001 in (Unknown)
+#6  0x007f9ff6b8ec50 in (Unknown)
+#7  0x007f9ff6b8ec50 in (Unknown)
+#8  0x007f9ff6b8ec50 in (Unknown)
+#9  0x007f9ff6b8ec50 in (Unknown)
+#10 0x007f9ff6b8ec50 in (Unknown)
+#11 0x007f9ff6b8ec50 in (Unknown)
+#12 0x007f9ff6b8ec50 in (Unknown)
+#13 0x007f9ff6b8ec50 in (Unknown)
+#14 0x007f9ff6b8ec50 in (Unknown)
+```
+
+
+### Native crash #4
+
+```
+Obtained 256 stack frames.
+#0  0x00000000000000 in (Unknown)
+#1  0x00000000000000 in (Unknown)
+#2  0x2000000000000001 in (Unknown)
+#3  0x007fa977b46a50 in (Unknown)
+#4  0x007fa977b46a50 in (Unknown)
+#5  0x007fa977b46a50 in (Unknown)
+#6  0x007fa977b46a50 in (Unknown)
+#7  0x007fa977b46a50 in (Unknown)
+#8  0x007fa977b46a50 in (Unknown)
+#9  0x007fa977b46a50 in (Unknown)
+#10 0x007fa977b46a50 in (Unknown)
+#11 0x007fa977b46a50 in (Unknown)
+#12 0x007fa977b46a50 in (Unknown)
+#13 0x007fa977b46a50 in (Unknown)
+#14 0x007fa977b46a50 in (Unknown)
 ```
